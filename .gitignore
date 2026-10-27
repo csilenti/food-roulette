@@ -1,0 +1,14 @@
+# 依赖（当前无构建链，预留）
+node_modules/
+
+# 构建产物
+dist/
+
+# 本地工具目录（AI 工作区 / 浏览器测试缓存，不入库）
+.workbuddy/
+.playwright-cli/
+
+# 日志与杂项
+*.log
+.DS_Store
+Thumbs.db
