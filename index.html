@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="今天吃什么 · 干饭命运转盘：别纠结了，转一下，答案就出来了。" />
+  <title>今天吃什么 · 干饭命运转盘</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 标题区 -->
+  <header class="site-header">
+    <h1 class="site-title">今天吃什么</h1>
+    <p class="site-subtitle">干饭命运转盘 · 别纠结了，转一下，答案就出来了</p>
+  </header>
+
+  <main class="layout">
+    <!-- 左栏：候选编辑 + 控制 -->
+    <section class="panel panel-editor" aria-label="候选编辑与控制区">
+      <div class="editor-card" id="editor-card">
+        <h2 class="panel-title">候选菜单</h2>
+
+        <form id="add-form" class="add-form" autocomplete="off">
+          <label class="visually-hidden" for="food-input">食物名称</label>
+          <input
+            id="food-input"
+            class="food-input"
+            type="text"
+            maxlength="8"
+            placeholder="输入食物名称..."
+          />
+          <button id="add-btn" class="btn btn-secondary" type="submit">添加</button>
+        </form>
+
+        <p id="editor-hint" class="editor-hint">转盘空空如也，先添加至少 2 个候选吧</p>
+
+        <ul id="tag-list" class="tag-list" aria-label="候选列表"></ul>
+
+        <!-- 旋转中编辑锁定蒙层 -->
+        <div id="editor-lock" class="editor-lock" hidden>
+          <span class="editor-lock-text">转盘转完再改～</span>
+        </div>
+      </div>
+
+      <div class="switch-group" role="group" aria-label="功能开关">
+        <label class="switch-item">
+          <span class="switch">
+            <input type="checkbox" id="sound-toggle" checked />
+            <span class="switch-slider" aria-hidden="true"></span>
+          </span>
+          <span class="switch-label">音效</span>
+        </label>
+        <label class="switch-item">
+          <span class="switch">
+            <input type="checkbox" id="remove-toggle" />
+            <span class="switch-slider" aria-hidden="true"></span>
+          </span>
+          <span class="switch-label">抽中后移除</span>
+        </label>
+        <label class="switch-item">
+          <span class="switch">
+            <input type="checkbox" id="ambience-toggle" />
+            <span class="switch-slider" aria-hidden="true"></span>
+          </span>
+          <span class="switch-label">氛围模式</span>
+        </label>
+      </div>
+
+      <div class="action-row">
+        <button id="spin-btn" class="btn btn-primary btn-big" type="button">开始抽奖</button>
+      </div>
+      <div class="action-row action-row-secondary">
+        <button id="reset-btn" class="btn btn-ghost" type="button">重置转盘</button>
+        <button id="clear-history-btn" class="btn btn-ghost" type="button">清空历史</button>
+      </div>
+    </section>
+
+    <!-- 右栏：转盘动画区（视觉核心） -->
+    <section class="panel panel-wheel" aria-label="转盘动画区">
+      <div class="wheel-stage">
+        <div id="bubble" class="bubble" hidden>
+          <span id="bubble-text" class="bubble-text"></span>
+        </div>
+        <div class="wheel-wrap">
+          <!-- 勺子指针：朝下固定在转盘顶部 -->
+          <div id="spoon" class="spoon" aria-hidden="true">
+            <svg viewBox="0 0 60 110" class="spoon-svg" focusable="false">
+              <rect x="23" y="2" width="14" height="54" rx="7"
+                    fill="#E4572E" stroke="#2B2118" stroke-width="4" />
+              <ellipse cx="30" cy="78" rx="21" ry="27"
+                       fill="#E4572E" stroke="#2B2118" stroke-width="4" />
+              <ellipse cx="30" cy="80" rx="10" ry="14" fill="#FFF6EA" opacity="0.85" />
+            </svg>
+          </div>
+          <div id="wheel-container" class="wheel-container"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 历史时间线 -->
+  <section id="history-section" class="history-section" aria-label="干饭历史">
+    <h2 class="panel-title">干饭历史</h2>
+    <ol id="history-list" class="history-list"></ol>
+    <p id="history-empty" class="history-empty">还没有干饭记录，转一把试试～</p>
+  </section>
+
+  <!-- 小票结果卡 -->
+  <div id="receipt-overlay" class="receipt-overlay" hidden>
+    <div class="receipt" role="dialog" aria-modal="true" aria-labelledby="receipt-name">
+      <p class="receipt-head">✦ 干饭命运判决 ✦</p>
+      <p class="receipt-label">今天就吃</p>
+      <p id="receipt-name" class="receipt-name">火 锅</p>
+      <p id="receipt-meta" class="receipt-meta">候选 8 项 · 第 1 格</p>
+      <div class="receipt-divider" aria-hidden="true"></div>
+      <p id="receipt-no" class="receipt-no">NO.000001</p>
+      <p id="receipt-time" class="receipt-time"></p>
+      <div class="receipt-actions">
+        <button id="again-btn" class="btn btn-secondary" type="button">再来一次</button>
+        <button id="ok-btn" class="btn btn-primary" type="button">就吃这个</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 轻提示 -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- 注意：使用普通 defer 脚本（非 ES Module），保证 file:// 双击直开可用 -->
+  <script src="js/audio.js" defer></script>
+  <script src="js/wheel.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
